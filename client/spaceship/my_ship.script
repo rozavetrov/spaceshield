@@ -1,0 +1,63 @@
+go.property("max_speed", 200)
+go.property("min_y", 60)
+go.property("max_y", 580)
+go.property("min_x", 60)
+go.property("max_x", 900)
+
+function init(self)
+	-- Let the script receive input from the player
+	msg.post(".", "acquire_input_focus")
+	-- maximum speed the instance can be moved
+	-- velocity of the instance, initially zero
+	self.velocity = vmath.vector3()
+end
+
+function update(self, dt)
+	local p = go.get_position()
+
+	if p.y < self.min_y then
+		p.y = self.min_y
+	elseif p.y > self.max_y then
+		p.y = self.max_y
+	end
+	if p.x < self.min_x then
+		p.x = self.min_x
+	elseif p.x > self.max_x then
+		p.x = self.max_x
+	end
+
+	go.set_position(p + dt * self.velocity)
+	self.velocity = vmath.vector3()
+	msg.post("factory#factory", "shipVector", {shipVector = p})
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("create_player") then
+		go.set_position(vmath.vector3(message.coords[1], message.coords[1], 0))
+	end
+	if message_id == hash("move_up") then
+		print("my ship up")
+		go.set_position(vmath.vector3(message.coords[1], message.coords[2], 0))
+	end
+end
+
+function on_input(self, action_id, action)
+	local p = go.get_position()
+	rads = math.atan2(action.y - p.y, action.x - p.x)
+	go.set(".", "euler.z", math.deg(rads) - 90)
+
+	-- Up
+	if action_id == hash("up") then
+		-- self.velocity.y = self.max_speed
+		msg.post("main", "up")
+		-- Down
+	elseif action_id == hash("down") then
+		self.velocity.y = -self.max_speed
+		-- Left
+	elseif action_id == hash("left") then
+		self.velocity.x = -self.max_speed
+		-- Right
+	elseif action_id == hash("right") then
+		self.velocity.x = self.max_speed
+	end
+end

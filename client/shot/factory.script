@@ -1,0 +1,19 @@
+function init(self)
+	self.shipVector = vmath.vector3()
+	msg.post(".", "acquire_input_focus")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("shipVector") then
+		self.shipVector = message.shipVector
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("fire") and action.released then
+		mouseVector = vmath.vector3(action.x, action.y, 0)
+		vector = vmath.normalize(mouseVector - self.shipVector)
+		angle = math.atan2(vector.y, vector.x)
+		shot_url = factory.create("#shot_factory", self.shipVector, vmath.quat_rotation_z(angle), { direction = vector }, 0.05)
+	end
+end

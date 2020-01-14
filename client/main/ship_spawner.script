@@ -1,0 +1,19 @@
+function init(self)
+	-- self.shipVector = vmath.vector3()
+	msg.post(".", "acquire_input_focus")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("new_player") then
+		local vector = vmath.vector3(message.coords[1], message.coords[1], 0)
+		ship_url = collectionfactory.create("#ship_factory", vector, nil, nil, 1)
+		print(ship_url[hash("/spaceship")])
+	end
+end
+-- 
+-- function on_input(self, action_id, action)
+-- 	if action_id == hash("player") and action.released then
+-- 		ship_url = collectionfactory.create("#ship_factory", vmath.vector3(100, 100, 0), nil, nil, 1)
+-- 		print(ship_url[hash("/spaceship")])
+-- 	end
+-- end

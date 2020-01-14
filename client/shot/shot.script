@@ -1,0 +1,24 @@
+go.property("direction", vmath.vector3())
+go.property("velocity", 1000)
+local screen = {width = 960;
+				height = 680}
+
+function init(self)
+	self.maxPos = {x = screen.width + 100;
+				y = screen.height + 100}
+	
+	self.minPos = {x = -100; 
+				y = -100}
+end
+
+function update(self, dt)
+	local p = go.get_position()
+	go.set_position(p + self.velocity * self.direction * dt)
+	if p.y > self.maxPos.y or p.y < self.minPos.y or p.x > self.maxPos.x or p.x < self.minPos.x then
+		go.delete()
+	end
+end
+
+function final(self)
+	-- I'm dead.
+end

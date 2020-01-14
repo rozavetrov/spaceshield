@@ -1,0 +1,57 @@
+local json = require "shared_json.json"
+local client_async = require "websocket.client_async"
+-- MAX_PLAYERS = 2
+
+function init(self)
+	self.ws = client_async({
+		connect_timeout = 5, -- optional timeout (in seconds) when connecting
+	})
+	
+	-- self.ws.state="OPEN"
+	
+	self.ws:on_connected(function(ok, err)
+		if ok then
+			print("Connected")
+			msg.post("#", "acquire_input_focus")
+		else
+			print("Unable to connect", err)
+		end
+	end)
+	
+	self.ws:on_disconnected(function()
+		print("Disconnected")
+	end)
+
+	self.ws:on_message(function(message)
+		local data = json.decode(message)
+		if data.ready == 1 then
+			print("sad")
+			-- msg.post("ship_spawner", "new_player", data)
+			msg.post("my_ship#my_ship", "create_player", data)
+		else 
+			msg.post("my_ship#my_ship", "move_up", data)
+		end
+	end)
+	
+	self.ws:connect("ws://127.0.0.1:8080")
+end
+
+-- function final(self)
+-- 	-- Add finalization code here
+-- 	-- Remove this function if not needed
+-- end
+-- 
+function update(self, dt)
+	self.ws:step()
+	-- new_positions = json.decode(self.client:receive("*l"))
+	
+	-- local position = vmath.vector3(new_position.x, new_position.y, 0)
+	
+end
+-- 
+function on_message(self, message_id, message, sender)
+	if message_id == hash("up") then 
+		-- print("up")
+		self.ws:send("up")
+	end
+end

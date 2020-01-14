@@ -1,0 +1,6 @@
+images {
+  image: "/shot/bullets_PNG35622.png"
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0
