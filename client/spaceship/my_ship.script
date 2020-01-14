@@ -10,34 +10,40 @@ function init(self)
 	-- maximum speed the instance can be moved
 	-- velocity of the instance, initially zero
 	self.velocity = vmath.vector3()
+	self.x = 0
+	self.y = 0
 end
 
 function update(self, dt)
-	local p = go.get_position()
-
-	if p.y < self.min_y then
-		p.y = self.min_y
-	elseif p.y > self.max_y then
-		p.y = self.max_y
+	if self.y < self.min_y then
+		self.y = self.min_y
+	elseif self.y > self.max_y then
+		self.y = self.max_y
 	end
-	if p.x < self.min_x then
-		p.x = self.min_x
-	elseif p.x > self.max_x then
-		p.x = self.max_x
+	if self.x < self.min_x then
+		self.x = self.min_x
+	elseif self.x > self.max_x then
+		self.x = self.max_x
 	end
 
-	go.set_position(p + dt * self.velocity)
-	self.velocity = vmath.vector3()
-	msg.post("factory#factory", "shipVector", {shipVector = p})
+	-- go.set_position(p + dt * self.velocity)
+	-- self.velocity = vmath.vector3()
+	
+	local position = vmath.vector3(self.y, self.x, 0)
+	go.set_position(position)
+
+	-- to shot factory 
+	msg.post("factory#factory", "shipVector", {shipVector = position})
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("create_player") then
-		go.set_position(vmath.vector3(message.coords[1], message.coords[1], 0))
+		self.x = message.coords[1]
+		self.y = message.coords[2]
 	end
-	if message_id == hash("move_up") then
-		print("my ship up")
-		go.set_position(vmath.vector3(message.coords[1], message.coords[2], 0))
+	if message_id == hash("move") then
+		self.x = message.coords[1]
+		self.y = message.coords[2]
 	end
 end
 
@@ -50,14 +56,17 @@ function on_input(self, action_id, action)
 	if action_id == hash("up") then
 		-- self.velocity.y = self.max_speed
 		msg.post("main", "up")
-		-- Down
+
 	elseif action_id == hash("down") then
-		self.velocity.y = -self.max_speed
-		-- Left
+		-- self.velocity.y = -self.max_speed
+		msg.post("main", "down")
+
 	elseif action_id == hash("left") then
-		self.velocity.x = -self.max_speed
-		-- Right
+		-- self.velocity.x = -self.max_speed
+		msg.post("main", "left")
+
 	elseif action_id == hash("right") then
-		self.velocity.x = self.max_speed
+		-- self.velocity.x = self.max_speed
+		msg.post("main", "right")
 	end
 end
